@@ -65,3 +65,12 @@ resource "aws_s3_bucket_website_configuration" "website" {
 
   depends_on = [ aws_s3_bucket_acl.example ]
 }
+
+resource "aws_instance" "example" {
+  ami           = "ami-00f251754ac5da7f0" 
+  instance_type = "t2.micro" 
+
+  tags = {
+    Name = "EC2 Instance for the project"
+  }
+}
