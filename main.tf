@@ -37,13 +37,18 @@ resource "aws_iam_role" "ec2_role" {
 
 # Policy for EC2 to Read from and Write to S3
 resource "aws_iam_policy" "s3_access" {
-  name   = "S3AccessPolicy"
+  name        = "S3AccessPolicy"
+  description = "Policy to allow bucket policy changes and object access"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = ["s3:GetObject"],
+        Effect = "Allow",
+        Action = [
+          "s3:PutBucketPolicy",
+          "s3:PutObject",
+          "s3:GetObject"
+        ],
         Resource = "arn:aws:s3:::${var.bucket_name}/*"
       }
     ]
@@ -62,10 +67,10 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 
 # Create EC2 instance to host HTML files
 resource "aws_instance" "web_server" {
-  ami                    = "ami-00f251754ac5da7f0"
-  instance_type          = var.ec2_instance_type
-  security_groups        = [aws_security_group.web_sg.name]
-  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  ami                  = "ami-00f251754ac5da7f0"
+  instance_type        = var.ec2_instance_type
+  security_groups      = [aws_security_group.web_sg.name]
+  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
 
   user_data = <<-EOF
     #!/bin/bash
@@ -106,8 +111,6 @@ resource "azurerm_storage_container" "media" {
   storage_account_name  = azurerm_storage_account.storage.name
   container_access_type = "container"
 }
-
-# Upload images to Azure Storage
 
 
 # Upload images to Azure Storage
@@ -333,11 +336,14 @@ resource "azurerm_storage_blob" "twitter" {
 
 
 
+
+# S3 Bucket for static website
 resource "aws_s3_bucket" "website_bucket" {
   bucket = "myterraformprojectwebsite"
 }
 
-resource "aws_s3_bucket_public_access_block" "website_bucket" {
+# Configure bucket to allow public access
+resource "aws_s3_bucket_public_access_block" "website_bucket_access" {
   bucket                  = aws_s3_bucket.website_bucket.id
   block_public_acls       = false
   block_public_policy     = false
@@ -345,6 +351,7 @@ resource "aws_s3_bucket_public_access_block" "website_bucket" {
   restrict_public_buckets = false
 }
 
+# Website configuration for S3 bucket
 resource "aws_s3_bucket_website_configuration" "website" {
   bucket = aws_s3_bucket.website_bucket.id
 
@@ -353,6 +360,7 @@ resource "aws_s3_bucket_website_configuration" "website" {
   }
 }
 
+# Public access policy for S3 bucket
 resource "aws_s3_bucket_policy" "public_access_policy" {
   bucket = aws_s3_bucket.website_bucket.id
   policy = jsonencode({
@@ -368,6 +376,7 @@ resource "aws_s3_bucket_policy" "public_access_policy" {
   })
 }
 
+# S3 objects for HTML files
 resource "aws_s3_object" "index_html" {
   bucket = aws_s3_bucket.website_bucket.bucket
   key    = "index.html"
