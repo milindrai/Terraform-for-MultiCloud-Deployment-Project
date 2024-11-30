@@ -12,5 +12,5 @@ variable "azure_resource_group_name" {
 }
 
 variable "azure_storage_account_name" {
-  default = "websitestoragemilind"
+  default = "websitestoragemilind22"
 }
