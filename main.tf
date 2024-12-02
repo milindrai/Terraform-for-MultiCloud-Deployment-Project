@@ -339,7 +339,7 @@ resource "azurerm_storage_blob" "twitter" {
 
 # S3 Bucket for static website
 resource "aws_s3_bucket" "website_bucket" {
-  bucket = "myterraformprojectwebsite"
+  bucket = "projectwebsiteexhibition"
 }
 
 # Configure bucket to allow public access
@@ -361,8 +361,9 @@ resource "aws_s3_bucket_website_configuration" "website" {
 }
 
 # Public access policy for S3 bucket
-resource "aws_s3_bucket_policy" "public_access_policy" {
+resource "aws_s3_bucket_policy" "website_bucket_policy" {
   bucket = aws_s3_bucket.website_bucket.id
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -370,11 +371,12 @@ resource "aws_s3_bucket_policy" "public_access_policy" {
         Effect    = "Allow",
         Principal = "*",
         Action    = "s3:GetObject",
-        Resource  = "arn:aws:s3:::${aws_s3_bucket.website_bucket.id}/*"
+        Resource  = "arn:aws:s3:::${aws_s3_bucket.website_bucket.bucket}/*"
       }
     ]
   })
 }
+
 
 # S3 objects for HTML files
 resource "aws_s3_object" "index_html" {

@@ -1,6 +1,6 @@
 # Define variables for resources
 variable "bucket_name" {
-  default = "myterraformprojectwebsite"
+  default = "projectwebsiteexhibition"
 }
 
 variable "ec2_instance_type" {
@@ -12,5 +12,5 @@ variable "azure_resource_group_name" {
 }
 
 variable "azure_storage_account_name" {
-  default = "websitestoragemilind22"
+  default = "websitestoragemilind11"
 }
